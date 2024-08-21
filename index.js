@@ -23,7 +23,11 @@ app.get("/", function (req, res) {
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
-
+app.get("/api", function (req, res) {
+  var date =new Date();
+  var unixTime=date.getTime();
+  res.json({unix:unixTime,utc:date.toUTCString()});
+});
 app.get("/api/:date",(req,res)=>{
   let dateReq=req.params['date'];
   if(!isNaN(dateReq)){
