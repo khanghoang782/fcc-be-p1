@@ -29,20 +29,29 @@ app.get("/api", function (req, res) {
   res.json({unix:unixTime,utc:date.toUTCString()});
 });
 app.get("/api/:date",(req,res)=>{
-  let dateReq=req.params['date'];
-  if(!isNaN(dateReq)){
-    const newDate=new Date(dateReq*1000);
-    return res.json({unix:dateReq,'utc':newDate.toUTCString()});
-  }
-  let date = new Date(dateReq);
-  if(date.toString()==="Invalid Date"){
-    return res.json({ error: "Invalid Date" });
-  }
-  if(dateReq.includes('-')){
-    return res.json({unix:Math.floor(date.getTime()/1000),utc:date.toUTCString()})
+  var dateParam=req.params['date'];
+  var parsedDate=Date.parse(dateParam);
+  console.log(dateParam+" - "+parsedDate);
+  if(!isNaN(parsedDate)){
+    let utc = new Date(dateParam);
+    let unix=Number(parsedDate);
+    //console.log("parsed: "+utc+"- "+unix);
+    res.json({'unix':unix,'utc':utc.toUTCString()});
+  }else{
+    let unix=Number(dateParam);
+    let utc = new Date(unix);
+    console.log("parsed 2: "+utc.toUTCString()+"- "+unix);
+    if(utc.toString()==="Invalid Date"){
+      res.json({'error':"Invalid Date"});
+    }else{
+      res.json({'unix':unix,'utc':utc.toUTCString()});
+    }
   }
 });
-
+app.use((req, res, next) => {
+  console.log(req.method+" - "+req.path+" - "+req.ip);
+  next();
+});
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
